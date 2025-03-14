@@ -1,0 +1,6 @@
+admin:admin123
+user:user123
+rakoto:rakoto123kin:1234:rakoto fiandry:aem
+rakoto@gmail.com:1234:rakoto:rakoto@gmail.com
+kino:1234:rakotofiandry:rakoto
+kino:1234:rakotofiandry:rakoto
