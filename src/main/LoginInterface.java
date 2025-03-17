@@ -3,74 +3,95 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Cette classe représente l'interface graphique pour le login.
+ * Elle permet à l'utilisateur de saisir son email et son mot de passe,
+ * et de se connecter ou de s'inscrire.
+ */
 public class LoginInterface extends JFrame {
-    private JTextField champUtilisateur;
+    private JTextField champEmail;
     private JPasswordField champMotDePasse;
     private JButton boutonLogin, boutonInscription;
     private JLabel labelMessage;
 
+    /**
+     * Constructeur de la classe LoginInterface.
+     * Initialise l'interface graphique.
+     */
     public LoginInterface() {
         setTitle("Login");
-        setSize(300, 250); /** Augmentation de la taille pour le nouveau bouton*/
+        setSize(400, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
         panel.setLayout(null);
 
-        
-        JLabel labelUtilisateur = new JLabel("Utilisateur:"); /** Champ utilisateur*/
-        labelUtilisateur.setBounds(10, 20, 80, 25);
-        panel.add(labelUtilisateur);
+        // Champ email
+        JLabel labelEmail = new JLabel("Email:");
+        labelEmail.setBounds(10, 20, 80, 25);
+        panel.add(labelEmail);
 
-        champUtilisateur = new JTextField(20);
-        champUtilisateur.setBounds(100, 20, 165, 25);
-        panel.add(champUtilisateur);
+        champEmail = new JTextField(20);
+        champEmail.setBounds(100, 20, 250, 25);
+        panel.add(champEmail);
 
-        JLabel labelMotDePasse = new JLabel("Mot de passe:");/** Champ mot de passe*/
+        // Champ mot de passe
+        JLabel labelMotDePasse = new JLabel("Mot de passe:");
         labelMotDePasse.setBounds(10, 50, 80, 25);
         panel.add(labelMotDePasse);
 
         champMotDePasse = new JPasswordField(20);
-        champMotDePasse.setBounds(100, 50, 165, 25);
+        champMotDePasse.setBounds(100, 50, 250, 25);
         panel.add(champMotDePasse);
 
-        boutonLogin = new JButton("Login"); /** Bouton de login*/
+        // Bouton de login
+        boutonLogin = new JButton("Login");
         boutonLogin.setBounds(10, 80, 80, 25);
         panel.add(boutonLogin);
 
-        boutonInscription = new JButton("S'inscrire");/** Bouton d'inscription*/
+        // Bouton d'inscription
+        boutonInscription = new JButton("S'inscrire");
         boutonInscription.setBounds(100, 80, 100, 25);
         panel.add(boutonInscription);
 
-        labelMessage = new JLabel("");/** Label pour les messages*/
-        labelMessage.setBounds(10, 110, 300, 25);
+        // Label pour les messages
+        labelMessage = new JLabel("");
+        labelMessage.setBounds(10, 110, 350, 25);
         panel.add(labelMessage);
 
-        boutonLogin.addActionListener(new ActionListener() { /** Action pour le bouton de login*/
+        // Action pour le bouton de login
+        boutonLogin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String utilisateur = champUtilisateur.getText();
+                String email = champEmail.getText();
                 String motDePasse = new String(champMotDePasse.getPassword());
                 GestionLogin gestionLogin = new GestionLogin();
-                if (gestionLogin.verifierLogin(utilisateur, motDePasse)) {
+
+                if (gestionLogin.verifierLogin(email, motDePasse)) {
                     labelMessage.setText("Login réussi!");
                 } else {
-                    labelMessage.setText("Erreur: Utilisateur non trouvé.");
+                    labelMessage.setText("Erreur: Email ou mot de passe incorrect.");
                 }
             }
         });
 
-        boutonInscription.addActionListener(new ActionListener() {/** Action pour le bouton d'inscription*/
+        // Action pour le bouton d'inscription
+        boutonInscription.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new InscriptionInterface().setVisible(true);/** Ouvrir une nouvelle fenêtre pour l'inscription*/
+                new InscriptionInterface().setVisible(true);
             }
         });
 
         add(panel);
     }
 
+    /**
+     * Méthode principale pour lancer l'application.
+     *
+     * @param args Les arguments de la ligne de commande (non utilisés).
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override

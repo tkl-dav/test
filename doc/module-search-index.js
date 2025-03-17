@@ -1,1 +1,1 @@
-moduleSearchIndex = [{"l":"TP_QCS"}];updateSearchResults();
+moduleSearchIndex = [];updateSearchResults();

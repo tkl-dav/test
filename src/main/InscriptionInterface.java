@@ -1,10 +1,16 @@
 package main;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Cette classe représente l'interface graphique pour l'inscription.
+ * Elle permet à l'utilisateur de saisir ses informations personnelles
+ * et de s'inscrire dans la base de données.
+ */
 public class InscriptionInterface extends JFrame {
-    private JTextField champNomComplet; /** Champs pour les informations de l'utilisateur*/
+    private JTextField champNomComplet;
     private JTextField champEmail;
     private JTextField champUtilisateur;
     private JPasswordField champMotDePasse;
@@ -12,16 +18,21 @@ public class InscriptionInterface extends JFrame {
     private JButton boutonValider;
     private JLabel labelMessage;
 
+    /**
+     * Constructeur de la classe InscriptionInterface.
+     * Initialise l'interface graphique.
+     */
     public InscriptionInterface() {
         setTitle("Inscription");
-        setSize(400, 300); /** Augmentation de la taille pour les nouveaux champs*/
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); /**Fermer seulement cette fenêtre*/
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
         panel.setLayout(null);
 
-        JLabel labelNomComplet = new JLabel("Nom complet:"); /** Champ nom complet*/
+        // Champ nom complet
+        JLabel labelNomComplet = new JLabel("Nom complet:");
         labelNomComplet.setBounds(10, 20, 100, 25);
         panel.add(labelNomComplet);
 
@@ -29,7 +40,8 @@ public class InscriptionInterface extends JFrame {
         champNomComplet.setBounds(120, 20, 250, 25);
         panel.add(champNomComplet);
 
-        JLabel labelEmail = new JLabel("Email:");/** Champ email*/
+        // Champ email
+        JLabel labelEmail = new JLabel("Email:");
         labelEmail.setBounds(10, 50, 100, 25);
         panel.add(labelEmail);
 
@@ -37,7 +49,8 @@ public class InscriptionInterface extends JFrame {
         champEmail.setBounds(120, 50, 250, 25);
         panel.add(champEmail);
 
-        JLabel labelUtilisateur = new JLabel("Nom d'utilisateur:"); /** Champ utilisateur*/
+        // Champ utilisateur
+        JLabel labelUtilisateur = new JLabel("Nom d'utilisateur:");
         labelUtilisateur.setBounds(10, 80, 100, 25);
         panel.add(labelUtilisateur);
 
@@ -45,7 +58,8 @@ public class InscriptionInterface extends JFrame {
         champUtilisateur.setBounds(120, 80, 250, 25);
         panel.add(champUtilisateur);
 
-        JLabel labelMotDePasse = new JLabel("Mot de passe:");/** Champ mot de passe*/
+        // Champ mot de passe
+        JLabel labelMotDePasse = new JLabel("Mot de passe:");
         labelMotDePasse.setBounds(10, 110, 100, 25);
         panel.add(labelMotDePasse);
 
@@ -53,7 +67,8 @@ public class InscriptionInterface extends JFrame {
         champMotDePasse.setBounds(120, 110, 250, 25);
         panel.add(champMotDePasse);
 
-        JLabel labelConfirmationMotDePasse = new JLabel("Confirmer mot de passe:");/** Champ confirmation de mot de passe*/
+        // Champ confirmation de mot de passe
+        JLabel labelConfirmationMotDePasse = new JLabel("Confirmer mot de passe:");
         labelConfirmationMotDePasse.setBounds(10, 140, 150, 25);
         panel.add(labelConfirmationMotDePasse);
 
@@ -61,32 +76,36 @@ public class InscriptionInterface extends JFrame {
         champConfirmationMotDePasse.setBounds(160, 140, 210, 25);
         panel.add(champConfirmationMotDePasse);
 
-        boutonValider = new JButton("Valider");/** Bouton de validation*/
+        // Bouton de validation
+        boutonValider = new JButton("Valider");
         boutonValider.setBounds(10, 180, 100, 25);
         panel.add(boutonValider);
 
-        labelMessage = new JLabel("");/** Label pour les messages*/
+        // Label pour les messages
+        labelMessage = new JLabel("");
         labelMessage.setBounds(10, 210, 350, 25);
         panel.add(labelMessage);
 
-        /** Action pour le bouton de validation*/
+        // Action pour le bouton de validation
         boutonValider.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) { /** Récupération des valeurs saisies*/
+            public void actionPerformed(ActionEvent e) {
                 String nomComplet = champNomComplet.getText();
                 String email = champEmail.getText();
                 String utilisateur = champUtilisateur.getText();
                 String motDePasse = new String(champMotDePasse.getPassword());
                 String confirmationMotDePasse = new String(champConfirmationMotDePasse.getPassword());
-                /** Validation des champs*/
+
+                GestionLogin gestionLogin = new GestionLogin();
+
                 if (nomComplet.isEmpty() || email.isEmpty() || utilisateur.isEmpty() || motDePasse.isEmpty() || confirmationMotDePasse.isEmpty()) {
                     labelMessage.setText("Erreur: Tous les champs doivent être remplis.");
                 } else if (!motDePasse.equals(confirmationMotDePasse)) {
                     labelMessage.setText("Erreur: Les mots de passe ne correspondent pas.");
+                } else if (!gestionLogin.validerEmail(email)) {
+                    labelMessage.setText("Erreur: Format d'email invalide.");
                 } else {
-                    /** Ajout de l'utilisateur à la base de données*/
-                    GestionLogin gestionLogin = new GestionLogin();
-                    gestionLogin.ajouterUtilisateur(utilisateur, motDePasse, nomComplet, email); /** Appel de la méthode mise à jour*/
+                    gestionLogin.ajouterUtilisateur(utilisateur, motDePasse, nomComplet, email);
                     labelMessage.setText("Inscription réussie!");
                 }
             }
