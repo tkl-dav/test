@@ -3,24 +3,15 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * Cette classe représente l'interface graphique pour le login.
- * Elle permet à l'utilisateur de saisir son email et son mot de passe,
- * et de se connecter ou de s'inscrire.
- */
 public class LoginInterface extends JFrame {
     private JTextField champEmail;
     private JPasswordField champMotDePasse;
-    private JButton boutonLogin, boutonInscription;
+    private JButton boutonLogin, boutonInscription, boutonAdmin;
     private JLabel labelMessage;
 
-    /**
-     * Constructeur de la classe LoginInterface.
-     * Initialise l'interface graphique.
-     */
     public LoginInterface() {
         setTitle("Login");
-        setSize(400, 200);
+        setSize(400, 250);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -55,6 +46,11 @@ public class LoginInterface extends JFrame {
         boutonInscription.setBounds(100, 80, 100, 25);
         panel.add(boutonInscription);
 
+        // Bouton administrateur
+        boutonAdmin = new JButton("Admin");
+        boutonAdmin.setBounds(210, 80, 80, 25);
+        panel.add(boutonAdmin);
+
         // Label pour les messages
         labelMessage = new JLabel("");
         labelMessage.setBounds(10, 110, 350, 25);
@@ -70,6 +66,9 @@ public class LoginInterface extends JFrame {
 
                 if (gestionLogin.verifierLogin(email, motDePasse)) {
                     labelMessage.setText("Login réussi!");
+                    if (email.equals("admin@example.com")) { // Vérifie si l'utilisateur est un admin
+                        new AdminInterface().setVisible(true); // Ouvrir l'interface admin
+                    }
                 } else {
                     labelMessage.setText("Erreur: Email ou mot de passe incorrect.");
                 }
@@ -84,14 +83,17 @@ public class LoginInterface extends JFrame {
             }
         });
 
+        // Action pour le bouton administrateur
+        boutonAdmin.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new AdminInterface().setVisible(true);
+            }
+        });
+
         add(panel);
     }
 
-    /**
-     * Méthode principale pour lancer l'application.
-     *
-     * @param args Les arguments de la ligne de commande (non utilisés).
-     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override

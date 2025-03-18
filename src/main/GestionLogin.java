@@ -9,7 +9,8 @@ import java.util.regex.*;
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.*;
 import java.util.Random;
-
+import java.util.ArrayList;
+import java.util.List;
 /**
  * Cette classe gère la logique de sauvegarde et de lecture des informations de login.
  * Elle utilise une base de données SQLite pour stocker les utilisateurs et hache les mots de passe avec BCrypt.
@@ -26,7 +27,32 @@ public class GestionLogin {
     public GestionLogin() {
         initialiserBaseDeDonnees();
     }
+    /**
+     * Récupère la liste de tous les utilisateurs dans la base de données.
+     *
+     * @return Une liste de tableaux contenant les informations des utilisateurs.
+     */
+    public List<String[]> listerUtilisateurs() {
+        List<String[]> utilisateurs = new ArrayList<>();
+        String sql = "SELECT username, fullname, email FROM users";
 
+        try (Connection conn = DriverManager.getConnection(DATABASE_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                String[] utilisateur = new String[]{
+                        rs.getString("username"),
+                        rs.getString("fullname"),
+                        rs.getString("email")
+                };
+                utilisateurs.add(utilisateur);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return utilisateurs;
+    }
     /**
      * Initialise la base de données en créant la table `users` si elle n'existe pas.
      */
@@ -41,6 +67,7 @@ public class GestionLogin {
         try (Connection conn = DriverManager.getConnection(DATABASE_URL);
              Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
+            System.out.println("Connexion à la base de données réussie.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -264,29 +291,35 @@ public class GestionLogin {
     }
 
     /**
-     * Permet à un utilisateur de définir un nouveau mot de passe après réinitialisation.
+     * Modifie le mot de passe d'un utilisateur.
      *
-     * @param email           L'email de l'utilisateur.
-     * @param motDePasseActuel Le mot de passe temporaire actuel.
+     * @param email            L'email de l'utilisateur.
+     * @param ancienMotDePasse L'ancien mot de passe pour confirmation.
      * @param nouveauMotDePasse Le nouveau mot de passe.
-     * @return true si la mise à jour est réussie, false sinon.
+     * @return true si la modification est réussie, false sinon.
      */
-    public boolean definirNouveauMotDePasse(String email, String motDePasseActuel, String nouveauMotDePasse) {
+    public boolean modifierMotDePasse(String email, String ancienMotDePasse, String nouveauMotDePasse) {
+        if (!validerEmail(email)) {
+            throw new IllegalArgumentException("Email invalide");
+        }
         if (!validerMotDePasse(nouveauMotDePasse)) {
-            throw new IllegalArgumentException("Le nouveau mot de passe ne respecte pas les règles de complexité.");
+            throw new IllegalArgumentException("Nouveau mot de passe invalide. Il doit contenir au moins 12 caractères, une majuscule, un chiffre et un caractère spécial (@#$%^&*).");
         }
 
-        // Vérifie que le mot de passe temporaire est correct
-        if (!verifierLogin(email, motDePasseActuel)) {
-            return false;
+        // Vérifier que l'ancien mot de passe est correct
+        if (!verifierLogin(email, ancienMotDePasse)) {
+            return false; // Ancien mot de passe incorrect
         }
 
-        String motDePasseHache = hacherMotDePasse(nouveauMotDePasse);
+        // Hacher le nouveau mot de passe
+        String nouveauMotDePasseHache = hacherMotDePasse(nouveauMotDePasse);
+
+        // Mettre à jour le mot de passe dans la base de données
         String sql = "UPDATE users SET password = ? WHERE email = ?";
 
         try (Connection conn = DriverManager.getConnection(DATABASE_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, motDePasseHache);
+            pstmt.setString(1, nouveauMotDePasseHache);
             pstmt.setString(2, email);
             int rowsUpdated = pstmt.executeUpdate();
             return rowsUpdated > 0;
