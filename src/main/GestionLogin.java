@@ -17,7 +17,7 @@ import java.util.List;
  * Elle implémente les opérations CRUD pour gérer les utilisateurs et la réinitialisation du mot de passe.
  */
 public class GestionLogin {
-    private static final String DATABASE_URL = "jdbc:sqlite:users.db";
+    public static String DATABASE_URL = "jdbc:sqlite:users.db";
 	public static String FICHIER_BASE_DONNEES;
 
     /**
@@ -56,7 +56,7 @@ public class GestionLogin {
     /**
      * Initialise la base de données en créant la table `users` si elle n'existe pas.
      */
-    private void initialiserBaseDeDonnees() {
+    public void initialiserBaseDeDonnees() {
         String sql = "CREATE TABLE IF NOT EXISTS users ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "username TEXT NOT NULL UNIQUE,"
