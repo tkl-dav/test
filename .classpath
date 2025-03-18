@@ -11,5 +11,7 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="D:/EclipseJava/eclipse-workspace/TP_QCS/sqlite-jdbc-3.49.1.0.jar"/>
+	<classpathentry kind="lib" path="D:/EclipseJava/eclipse-workspace/TP_QCS/jBCrypt-0.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

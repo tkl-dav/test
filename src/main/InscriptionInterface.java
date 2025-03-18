@@ -104,6 +104,8 @@ public class InscriptionInterface extends JFrame {
                     labelMessage.setText("Erreur: Les mots de passe ne correspondent pas.");
                 } else if (!gestionLogin.validerEmail(email)) {
                     labelMessage.setText("Erreur: Format d'email invalide.");
+                } else if (!gestionLogin.validerMotDePasse(motDePasse)) {
+                    labelMessage.setText("Erreur: Le mot de passe doit contenir au moins 12 caractères, une majuscule, un chiffre et un caractère spécial (@#$%^&*).");
                 } else {
                     gestionLogin.ajouterUtilisateur(utilisateur, motDePasse, nomComplet, email);
                     labelMessage.setText("Inscription réussie!");
