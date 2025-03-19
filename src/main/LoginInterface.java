@@ -11,7 +11,7 @@ public class LoginInterface extends JFrame {
 
     public LoginInterface() {
         setTitle("Login");
-        setSize(400, 250);
+        setSize(400, 304);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -76,12 +76,12 @@ public class LoginInterface extends JFrame {
         });
 
         // Action pour le bouton d'inscription
-        boutonInscription.addActionListener(new ActionListener() {
+        /**boutonInscription.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new InscriptionInterface().setVisible(true);
             }
-        });
+        });*/
 
         // Action pour le bouton administrateur
         boutonAdmin.addActionListener(new ActionListener() {
@@ -91,8 +91,8 @@ public class LoginInterface extends JFrame {
             }
         });
 
-        add(panel);
-    }
+        getContentPane().add(panel);
+    } 
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
