@@ -33,7 +33,7 @@ jobs:
     - name: Compile Java files
       run: |
         mkdir -p bin  # Crée le répertoire bin pour les fichiers compilés
-        javac -d bin -cp ".:sqlite-jdbc-3.49.0.0.jar:junit-platform-console-standalone.jar" src/authentification/*.java  # Compile les fichiers .java avec le driver SQLite et JUnit 5
+        javac -d bin -cp ".:sqlite-jdbc-3.49.0.0.jar:junit-platform-console-standalone.jar" src/main/*.java  # Compile les fichiers .java avec le driver SQLite et JUnit 5
 
     - name: Run tests
       run: |
