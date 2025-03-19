@@ -56,7 +56,7 @@ jobs:
     - name: Build and package the application
       run: |
         mkdir -p bin
-        javac -d bin -cp ".:sqlite-jdbc-3.49.0.0.jar:junit-platform-console-standalone.jar" src/authentification/*.java  # Compile les fichiers source Java
+        javac -d bin -cp ".:sqlite-jdbc-3.49.0.0.jar:junit-platform-console-standalone.jar" src/main/*.java  # Compile les fichiers source Java
 
     - name: Create JAR package
       run: |
