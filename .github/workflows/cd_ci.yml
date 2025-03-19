@@ -24,7 +24,7 @@ jobs:
 
     - name: Install SQLite JDBC Driver
       run: |
-        wget https://github.com/xerial/sqlite-jdbc/releases/download/3.42.0.0/sqlite-jdbc-3.49.0.0.jar  # Télécharge le driver JDBC pour SQLite
+        wget https://github.com/xerial/sqlite-jdbc/releases/download/3.49.0.0/sqlite-jdbc-3.49.0.0.jar  # Télécharge le driver JDBC pour SQLite
 
     - name: Install JUnit 5
       run: |
