@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Utilise la dernière version stable d'Ubuntu
+    runs-on: windows  # Utilise la dernière version stable d'Ubuntu
 
     steps:
     - name: Checkout code
@@ -19,7 +19,7 @@ jobs:
     - name: Set up Zulu JDK 17
       uses: actions/setup-java@v3  # Utilise l'action setup-java pour installer JDK
       with:
-        java-version: '17'  # Spécifie que vous voulez utiliser JDK 23.0.2
+        java-version: '17'  # Spécifie que vous voulez utiliser JDK 17.0.2
         distribution: 'temurin'  # Utilisation de la distribution Zulu OpenJDK
 
     - name: Install SQLite JDBC Driver
@@ -33,15 +33,15 @@ jobs:
     - name: Compile Java files
       run: |
         mkdir -p bin  # Crée le répertoire bin pour les fichiers compilés
-        javac -d bin -cp ".:sqlite-jdbc-3.49.0.0.jar:junit-platform-console-standalone.jar" src/main/*.java  # Compile les fichiers .java avec le driver SQLite et JUnit 5
-
+        javac -d bin -cp ".:sqlite-jdbc-3.49.0.0.jar:junit-platform-console-standalone.jar:jBCrypt-0.4.jar" src/main/*.java  # Compile les fichiers .java avec le driver SQLite et JUnit 5
+    
     - name: Run tests
       run: |
-        java -cp ".:bin:sqlite-jdbc-3.49.0.0.jar:junit-platform-console-standalone.jar" org.junit.platform.console.ConsoleLauncher --scan-classpath  # Exécute vos tests avec JUnit 5 et le driver JDBC SQLite
+        java -cp ".:bin:sqlite-jdbc-3.49.0.0.jar:junit-platform-console-standalone.jar:jBCrypt-0.4.jar" org.junit.platform.console.ConsoleLauncher --scan-classpath  # Exécute vos tests avec JUnit 5 et le driver JDBC SQLite
 
   deploy:
     needs: build  # Assure que l'étape de déploiement se fait uniquement après que le build soit terminé avec succès
-    runs-on: ubuntu-latest  # Utilise également la dernière version stable d'Ubuntu
+    runs-on: windows  # Utilise également la dernière version stable d'Ubuntu
 
     steps:
     - name: Checkout code
@@ -56,7 +56,7 @@ jobs:
     - name: Build and package the application
       run: |
         mkdir -p bin
-        javac -d bin -cp ".:sqlite-jdbc-3.49.0.0.jar:junit-platform-console-standalone.jar" src/main/*.java  # Compile les fichiers source Java
+        javac -d bin -cp ".:sqlite-jdbc-3.49.0.0.jar:junit-platform-console-standalone.jar:jBCrypt-0.4.jar" src/main/*.java  # Compile les fichiers source Java
 
     - name: Create JAR package
       run: |
