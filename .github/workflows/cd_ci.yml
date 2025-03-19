@@ -33,11 +33,11 @@ jobs:
     - name: Compile Java files
       run: |
         mkdir -p bin  # Crée le répertoire bin pour les fichiers compilés
-        javac -d bin -cp ".:sqlite-jdbc-3.42.0.0.jar:junit-platform-console-standalone.jar" src/authentification/*.java  # Compile les fichiers .java avec le driver SQLite et JUnit 5
+        javac -d bin -cp ".:sqlite-jdbc-3.49.0.0.jar:junit-platform-console-standalone.jar" src/authentification/*.java  # Compile les fichiers .java avec le driver SQLite et JUnit 5
 
     - name: Run tests
       run: |
-        java -cp ".:bin:sqlite-jdbc-3.42.0.0.jar:junit-platform-console-standalone.jar" org.junit.platform.console.ConsoleLauncher --scan-classpath  # Exécute vos tests avec JUnit 5 et le driver JDBC SQLite
+        java -cp ".:bin:sqlite-jdbc-3.49.0.0.jar:junit-platform-console-standalone.jar" org.junit.platform.console.ConsoleLauncher --scan-classpath  # Exécute vos tests avec JUnit 5 et le driver JDBC SQLite
 
   deploy:
     needs: build  # Assure que l'étape de déploiement se fait uniquement après que le build soit terminé avec succès
