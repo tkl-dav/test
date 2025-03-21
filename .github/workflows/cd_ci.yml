@@ -11,7 +11,7 @@ name: Java CI/CD for Java Project
  
  jobs:
    build:
-     runs-on: ubuntu-latest  # Utilise la dernière version stable d'Ubuntu
+     runs-on: windows  # Utilise la dernière version stable d'Ubuntu
  
      steps:
      - name: Checkout code
@@ -42,7 +42,7 @@ name: Java CI/CD for Java Project
  
    deploy:
      needs: build  # Assure que l'étape de déploiement se fait uniquement après que le build soit terminé avec succès
-     runs-on: ubuntu-latest  # Utilise également la dernière version stable d'Ubuntu
+     runs-on: windows  # Utilise également la dernière version stable d'Ubuntu
  
      steps:
      - name: Checkout code
