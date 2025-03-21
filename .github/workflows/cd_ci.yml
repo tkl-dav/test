@@ -1,5 +1,5 @@
 name: Java CI/CD for Java Project
-<<<<<<< HEAD
+
  
  on:
    push:
@@ -68,7 +68,7 @@ name: Java CI/CD for Java Project
          # OU
          # Si vous déployez sur un service comme AWS, Azure, ou Google Cloud, vous pouvez utiliser leurs CLI pour déployer
          # aws s3 cp my-app.jar s3://your-bucket-name/
-=======
+
 
 on:
   push:
@@ -139,4 +139,3 @@ jobs:
         # OU
         # Si vous déployez sur un service comme AWS, Azure, ou Google Cloud, vous pouvez utiliser leurs CLI pour déployer
         # aws s3 cp my-app.jar s3://your-bucket-name/
->>>>>>> ae8edc49eae5b0e72e70f6065ed0818d20b2d0f3
