@@ -1,24 +1,16 @@
 package main;
-
-/**import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.*;
-*/
-
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.*;
-import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
 /**
  * Cette classe gère la logique de sauvegarde et de lecture des informations de login.
  * Elle utilise une base de données SQLite pour stocker les utilisateurs et hache les mots de passe avec BCrypt.
- * Elle implémente les opérations CRUD pour gérer les utilisateurs et la réinitialisation du mot de passe.
  */
 public class GestionLogin {
     public static String DATABASE_URL = "jdbc:sqlite:users.db";
-	public static String FICHIER_BASE_DONNEES;
 
     /**
      * Constructeur de la classe GestionLogin.
@@ -27,32 +19,7 @@ public class GestionLogin {
     public GestionLogin() {
         initialiserBaseDeDonnees();
     }
-    /**
-     * Récupère la liste de tous les utilisateurs dans la base de données.
-     *
-     * @return Une liste de tableaux contenant les informations des utilisateurs.
-     */
-    public List<String[]> listerUtilisateurs() {
-        List<String[]> utilisateurs = new ArrayList<>();
-        String sql = "SELECT username, fullname, email FROM users";
 
-        try (Connection conn = DriverManager.getConnection(DATABASE_URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-
-            while (rs.next()) {
-                String[] utilisateur = new String[]{
-                        rs.getString("username"),
-                        rs.getString("fullname"),
-                        rs.getString("email")
-                };
-                utilisateurs.add(utilisateur);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return utilisateurs;
-    }
     /**
      * Initialise la base de données en créant la table `users` si elle n'existe pas.
      */
@@ -62,14 +29,15 @@ public class GestionLogin {
                 + "username TEXT NOT NULL UNIQUE,"
                 + "password TEXT NOT NULL,"
                 + "fullname TEXT NOT NULL,"
-                + "email TEXT NOT NULL UNIQUE)";
+                + "email TEXT NOT NULL UNIQUE,"
+                + "role TEXT DEFAULT 'user')"; 
 
         try (Connection conn = DriverManager.getConnection(DATABASE_URL);
              Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
-            System.out.println("Connexion à la base de données réussie.");
         } catch (SQLException e) {
-            e.printStackTrace();
+        	System.err.println("Erreur lors de l'initialisation de la base de données : " + e.getMessage());
+            throw new RuntimeException("Erreur de base de données", e);
         }
     }
 
@@ -106,6 +74,60 @@ public class GestionLogin {
     }
 
     /**
+     * Vérifie si les informations de login (email et mot de passe) sont valides.
+     *
+     * @param email      L'email de l'utilisateur.
+     * @param motDePasse Le mot de passe de l'utilisateur.
+     * @return true si les informations sont valides, false sinon.
+     */
+    public boolean verifierLogin(String email, String motDePasse) {
+        if (!validerEmail(email)) {
+            return false; // Email invalide
+        }
+
+        String sql = "SELECT password FROM users WHERE email = ?";
+
+        try (Connection conn = DriverManager.getConnection(DATABASE_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                String motDePasseHache = rs.getString("password");
+                return BCrypt.checkpw(motDePasse, motDePasseHache); // Vérifie le mot de passe
+            }
+        } catch (SQLException e) {
+        	System.err.println("Erreur lors de la vérification du login : " + e.getMessage());
+            throw new RuntimeException("Erreur de base de données", e);
+        }
+        return false;
+    }
+
+    /**
+     * Vérifie si un utilisateur est un admin.
+     *
+     * @param email L'email de l'utilisateur.
+     * @return true si l'utilisateur est un admin, false sinon.
+     */
+    public boolean estAdmin(String email) {
+        String sql = "SELECT role FROM users WHERE email = ?";
+
+        try (Connection conn = DriverManager.getConnection(DATABASE_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                String role = rs.getString("role");
+                return "admin".equals(role); // Vérifie si le rôle est "admin"
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
      * Ajoute un nouvel utilisateur à la base de données.
      *
      * @param utilisateur Le nom d'utilisateur.
@@ -133,35 +155,37 @@ public class GestionLogin {
             pstmt.setString(4, email);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+        	System.err.println("Erreur lors de l'ajout de l'utilisateur : " + e.getMessage());
+            throw new RuntimeException("Erreur de base de données", e);
         }
     }
 
     /**
-     * Récupère les informations d'un utilisateur par son email.
+     * Récupère la liste de tous les utilisateurs dans la base de données.
      *
-     * @param email L'email de l'utilisateur.
-     * @return Un tableau de chaînes contenant [username, fullname, email], ou null si l'utilisateur n'existe pas.
+     * @return Une liste de tableaux contenant les informations des utilisateurs.
      */
-    public String[] lireUtilisateur(String email) {
-        String sql = "SELECT username, fullname, email FROM users WHERE email = ?";
+    public List<String[]> listerUtilisateurs() {
+        List<String[]> utilisateurs = new ArrayList<>();
+        String sql = "SELECT username, fullname, email, role FROM users";
 
         try (Connection conn = DriverManager.getConnection(DATABASE_URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, email);
-            ResultSet rs = pstmt.executeQuery();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
 
-            if (rs.next()) {
-                String[] utilisateur = new String[3];
-                utilisateur[0] = rs.getString("username");
-                utilisateur[1] = rs.getString("fullname");
-                utilisateur[2] = rs.getString("email");
-                return utilisateur;
+            while (rs.next()) {
+                String[] utilisateur = new String[]{
+                        rs.getString("username"),
+                        rs.getString("fullname"),
+                        rs.getString("email"),
+                        rs.getString("role")
+                };
+                utilisateurs.add(utilisateur);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return utilisateurs;
     }
 
     /**
@@ -171,13 +195,8 @@ public class GestionLogin {
      * @param utilisateur Le nouveau nom d'utilisateur.
      * @param nomComplet  Le nouveau nom complet.
      * @param nouveauEmail Le nouvel email.
-     * @return true si la mise à jour est réussie, false sinon.
      */
-    public boolean mettreAJourUtilisateur(String email, String utilisateur, String nomComplet, String nouveauEmail) {
-        if (!validerEmail(nouveauEmail)) {
-            throw new IllegalArgumentException("Nouvel email invalide");
-        }
-
+    public void mettreAJourUtilisateur(String email, String utilisateur, String nomComplet, String nouveauEmail) {
         String sql = "UPDATE users SET username = ?, fullname = ?, email = ? WHERE email = ?";
 
         try (Connection conn = DriverManager.getConnection(DATABASE_URL);
@@ -186,44 +205,40 @@ public class GestionLogin {
             pstmt.setString(2, nomComplet);
             pstmt.setString(3, nouveauEmail);
             pstmt.setString(4, email);
-            int rowsUpdated = pstmt.executeUpdate();
-            return rowsUpdated > 0;
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
     }
 
     /**
      * Supprime un utilisateur par son email.
      *
      * @param email L'email de l'utilisateur à supprimer.
-     * @return true si la suppression est réussie, false sinon.
      */
-    public boolean supprimerUtilisateur(String email) {
+    public void supprimerUtilisateur(String email) {
         String sql = "DELETE FROM users WHERE email = ?";
 
         try (Connection conn = DriverManager.getConnection(DATABASE_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);
-            int rowsDeleted = pstmt.executeUpdate();
-            return rowsDeleted > 0;
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
     }
 
     /**
-     * Vérifie si les informations de login (email et mot de passe) sont valides.
+     * Modifie le mot de passe d'un utilisateur.
      *
-     * @param email      L'email de l'utilisateur.
-     * @param motDePasse Le mot de passe de l'utilisateur.
-     * @return true si les informations sont valides, false sinon.
+     * @param email           L'email de l'utilisateur.
+     * @param ancienMotDePasse L'ancien mot de passe pour confirmation.
+     * @param nouveauMotDePasse Le nouveau mot de passe.
+     * @return true si la modification est réussie, false sinon.
      */
-    public boolean verifierLogin(String email, String motDePasse) {
-        if (!validerEmail(email)) {
-            return false; // Email invalide
+    public boolean modifierMotDePasse(String email, String ancienMotDePasse, String nouveauMotDePasse) {
+        if (!validerMotDePasse(nouveauMotDePasse)) {
+            throw new IllegalArgumentException("Le nouveau mot de passe est invalide.");
         }
 
         String sql = "SELECT password FROM users WHERE email = ?";
@@ -235,7 +250,16 @@ public class GestionLogin {
 
             if (rs.next()) {
                 String motDePasseHache = rs.getString("password");
-                return BCrypt.checkpw(motDePasse, motDePasseHache); // Vérifie le mot de passe
+                if (BCrypt.checkpw(ancienMotDePasse, motDePasseHache)) {
+                    String nouveauMotDePasseHache = hacherMotDePasse(nouveauMotDePasse);
+                    String updateSql = "UPDATE users SET password = ? WHERE email = ?";
+                    try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                        updateStmt.setString(1, nouveauMotDePasseHache);
+                        updateStmt.setString(2, email);
+                        updateStmt.executeUpdate();
+                        return true;
+                    }
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -244,11 +268,11 @@ public class GestionLogin {
     }
 
     /**
-     * Génère un mot de passe temporaire aléatoire.
+     * Génère un mot de passe temporaire.
      *
      * @return Un mot de passe temporaire.
      */
-    private String genererMotDePasseTemporaire() {
+    public String genererMotDePasseTemporaire() {
         String caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*";
         Random random = new Random();
         StringBuilder motDePasse = new StringBuilder();
@@ -260,16 +284,12 @@ public class GestionLogin {
     }
 
     /**
-     * Réinitialise le mot de passe d'un utilisateur et génère un mot de passe temporaire.
+     * Réinitialise le mot de passe d'un utilisateur avec un mot de passe temporaire.
      *
      * @param email L'email de l'utilisateur.
-     * @return Le mot de passe temporaire généré, ou null si l'utilisateur n'existe pas.
+     * @return Le mot de passe temporaire généré.
      */
     public String reinitialiserMotDePasse(String email) {
-        if (!validerEmail(email)) {
-            throw new IllegalArgumentException("Email invalide");
-        }
-
         String motDePasseTemporaire = genererMotDePasseTemporaire();
         String motDePasseHache = hacherMotDePasse(motDePasseTemporaire);
 
@@ -279,53 +299,15 @@ public class GestionLogin {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, motDePasseHache);
             pstmt.setString(2, email);
-            int rowsUpdated = pstmt.executeUpdate();
-
-            if (rowsUpdated > 0) {
-                return motDePasseTemporaire; // Retourne le mot de passe temporaire
-            }
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null; // Utilisateur non trouvé
+        return motDePasseTemporaire;
     }
 
-    /**
-     * Modifie le mot de passe d'un utilisateur.
-     *
-     * @param email            L'email de l'utilisateur.
-     * @param ancienMotDePasse L'ancien mot de passe pour confirmation.
-     * @param nouveauMotDePasse Le nouveau mot de passe.
-     * @return true si la modification est réussie, false sinon.
-     */
-    public boolean modifierMotDePasse(String email, String ancienMotDePasse, String nouveauMotDePasse) {
-        if (!validerEmail(email)) {
-            throw new IllegalArgumentException("Email invalide");
-        }
-        if (!validerMotDePasse(nouveauMotDePasse)) {
-            throw new IllegalArgumentException("Nouveau mot de passe invalide. Il doit contenir au moins 12 caractères, une majuscule, un chiffre et un caractère spécial (@#$%^&*).");
-        }
-
-        // Vérifier que l'ancien mot de passe est correct
-        if (!verifierLogin(email, ancienMotDePasse)) {
-            return false; // Ancien mot de passe incorrect
-        }
-
-        // Hacher le nouveau mot de passe
-        String nouveauMotDePasseHache = hacherMotDePasse(nouveauMotDePasse);
-
-        // Mettre à jour le mot de passe dans la base de données
-        String sql = "UPDATE users SET password = ? WHERE email = ?";
-
-        try (Connection conn = DriverManager.getConnection(DATABASE_URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, nouveauMotDePasseHache);
-            pstmt.setString(2, email);
-            int rowsUpdated = pstmt.executeUpdate();
-            return rowsUpdated > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
+	public String[] lireUtilisateur(String string) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

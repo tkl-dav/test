@@ -1,13 +1,11 @@
 package main;
-
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
  * Cette classe représente l'interface graphique pour l'inscription.
- * Elle permet à l'utilisateur de saisir ses informations personnelles
- * et de s'inscrire dans la base de données.
+ * Elle permet à un utilisateur de s'inscrire en saisissant ses informations personnelles.
  */
 public class InscriptionInterface extends JFrame {
     private JTextField champNomComplet;
@@ -18,10 +16,6 @@ public class InscriptionInterface extends JFrame {
     private JButton boutonValider;
     private JLabel labelMessage;
 
-    /**
-     * Constructeur de la classe InscriptionInterface.
-     * Initialise l'interface graphique.
-     */
     public InscriptionInterface() {
         setTitle("Inscription");
         setSize(400, 300);
@@ -99,16 +93,16 @@ public class InscriptionInterface extends JFrame {
                 GestionLogin gestionLogin = new GestionLogin();
 
                 if (nomComplet.isEmpty() || email.isEmpty() || utilisateur.isEmpty() || motDePasse.isEmpty() || confirmationMotDePasse.isEmpty()) {
-                    labelMessage.setText("Erreur: Tous les champs doivent être remplis.");
+                	JOptionPane.showMessageDialog(InscriptionInterface.this, "Erreur: Tous les champs doivent être remplis.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 } else if (!motDePasse.equals(confirmationMotDePasse)) {
-                    labelMessage.setText("Erreur: Les mots de passe ne correspondent pas.");
+                	JOptionPane.showMessageDialog(InscriptionInterface.this, "Erreur: Les mots de passe ne correspondent pas.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 } else if (!gestionLogin.validerEmail(email)) {
-                    labelMessage.setText("Erreur: Format d'email invalide.");
+                	JOptionPane.showMessageDialog(InscriptionInterface.this, "Erreur: Format d'email invalide.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 } else if (!gestionLogin.validerMotDePasse(motDePasse)) {
-                    labelMessage.setText("Erreur: Le mot de passe doit contenir au moins 12 caractères, une majuscule, un chiffre et un caractère spécial (@#$%^&*).");
+                	JOptionPane.showMessageDialog(InscriptionInterface.this, "Erreur: Le mot de passe doit contenir au moins 12 caractères, une majuscule, un chiffre et un caractère spécial (@#$%^&*).", "Erreur", JOptionPane.ERROR_MESSAGE);
                 } else {
                     gestionLogin.ajouterUtilisateur(utilisateur, motDePasse, nomComplet, email);
-                    labelMessage.setText("Inscription réussie!");
+                    JOptionPane.showMessageDialog(InscriptionInterface.this, "Inscription réussie!", "Succès", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         });

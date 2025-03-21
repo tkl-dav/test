@@ -3,15 +3,20 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Cette classe représente l'interface graphique pour le login.
+ * Elle permet à l'utilisateur de saisir son email et son mot de passe,
+ * et de se connecter ou de s'inscrire.
+ */
 public class LoginInterface extends JFrame {
     private JTextField champEmail;
     private JPasswordField champMotDePasse;
-    private JButton boutonLogin, boutonInscription, boutonAdmin;
+    private JButton boutonLogin, boutonInscription;
     private JLabel labelMessage;
 
     public LoginInterface() {
         setTitle("Login");
-        setSize(400, 304);
+        setSize(400, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -46,11 +51,6 @@ public class LoginInterface extends JFrame {
         boutonInscription.setBounds(100, 80, 100, 25);
         panel.add(boutonInscription);
 
-        // Bouton administrateur
-        boutonAdmin = new JButton("Admin");
-        boutonAdmin.setBounds(210, 80, 80, 25);
-        panel.add(boutonAdmin);
-
         // Label pour les messages
         labelMessage = new JLabel("");
         labelMessage.setBounds(10, 110, 350, 25);
@@ -65,34 +65,28 @@ public class LoginInterface extends JFrame {
                 GestionLogin gestionLogin = new GestionLogin();
 
                 if (gestionLogin.verifierLogin(email, motDePasse)) {
-                    labelMessage.setText("Login réussi!");
-                    if (email.equals("admin@example.com")) { // Vérifie si l'utilisateur est un admin
+                	JOptionPane.showMessageDialog(LoginInterface.this, "Login réussi!", "Succès", JOptionPane.INFORMATION_MESSAGE);
+
+                    // Vérifier si l'utilisateur est un admin
+                    if (gestionLogin.estAdmin(email)) {
                         new AdminInterface().setVisible(true); // Ouvrir l'interface admin
                     }
                 } else {
-                    labelMessage.setText("Erreur: Email ou mot de passe incorrect.");
+                	JOptionPane.showMessageDialog(LoginInterface.this, "Erreur: Email ou mot de passe incorrect.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
         // Action pour le bouton d'inscription
-        /**boutonInscription.addActionListener(new ActionListener() {
+        boutonInscription.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new InscriptionInterface().setVisible(true);
             }
-        });*/
-
-        // Action pour le bouton administrateur
-        boutonAdmin.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new AdminInterface().setVisible(true);
-            }
         });
 
-        getContentPane().add(panel);
-    } 
+        add(panel);
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {

@@ -144,4 +144,19 @@ class GestionLoginTest {
         List<String[]> utilisateurs = gestionLogin.listerUtilisateurs();
         assertEquals(2, utilisateurs.size()); // Vérifie que deux utilisateurs sont retournés
     }
+
+    @Test
+    void testEstAdmin() {
+        // Ajouter un utilisateur admin
+        gestionLogin.ajouterUtilisateur("admin", "Admin123@", "Admin", "admin@example.com");
+
+        // Vérifier que l'utilisateur est un admin
+        assertTrue(gestionLogin.estAdmin("admin@example.com"));
+
+        // Ajouter un utilisateur normal
+        gestionLogin.ajouterUtilisateur("user", "User123@", "User", "user@example.com");
+
+        // Vérifier que l'utilisateur n'est pas un admin
+        assertFalse(gestionLogin.estAdmin("user@example.com"));
+    }
 }

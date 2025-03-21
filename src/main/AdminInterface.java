@@ -1,12 +1,13 @@
 package main;
-
-import java.awt.EventQueue;
-import javax.swing.JFrame;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+/**
+ * Cette classe représente l'interface graphique pour l'administration des utilisateurs.
+ * Elle permet à un administrateur de gérer les utilisateurs (ajouter, modifier, supprimer, réinitialiser les mots de passe).
+ */
 public class AdminInterface extends JFrame {
     private JTextArea textAreaUtilisateurs;
     private JButton boutonRafraichir, boutonAjouter, boutonModifier, boutonSupprimer, boutonReinitialiser;
@@ -116,10 +117,10 @@ public class AdminInterface extends JFrame {
                 GestionLogin gestionLogin = new GestionLogin();
                 try {
                     gestionLogin.ajouterUtilisateur(username, password, fullname, email);
-                    labelMessage.setText("Utilisateur ajouté avec succès.");
+                    JOptionPane.showMessageDialog(AdminInterface.this, "Utilisateur ajouté avec succès.", "Succès", JOptionPane.INFORMATION_MESSAGE);
                     rafraichirListeUtilisateurs();
                 } catch (IllegalArgumentException ex) {
-                    labelMessage.setText("Erreur : " + ex.getMessage());
+                	JOptionPane.showMessageDialog(AdminInterface.this, "Erreur : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -135,7 +136,7 @@ public class AdminInterface extends JFrame {
 
                 GestionLogin gestionLogin = new GestionLogin();
                 gestionLogin.mettreAJourUtilisateur(email, username, fullname, nouveauEmail);
-                labelMessage.setText("Utilisateur modifié avec succès.");
+                JOptionPane.showMessageDialog(AdminInterface.this, "Utilisateur modifié avec succès.", "Succès", JOptionPane.INFORMATION_MESSAGE);
                 rafraichirListeUtilisateurs();
             }
         });
@@ -148,7 +149,7 @@ public class AdminInterface extends JFrame {
 
                 GestionLogin gestionLogin = new GestionLogin();
                 gestionLogin.supprimerUtilisateur(email);
-                labelMessage.setText("Utilisateur supprimé avec succès.");
+                JOptionPane.showMessageDialog(AdminInterface.this, "Utilisateur supprimé avec succès.", "Succès", JOptionPane.INFORMATION_MESSAGE);
                 rafraichirListeUtilisateurs();
             }
         });
@@ -161,7 +162,7 @@ public class AdminInterface extends JFrame {
 
                 GestionLogin gestionLogin = new GestionLogin();
                 String motDePasseTemporaire = gestionLogin.reinitialiserMotDePasse(email);
-                labelMessage.setText("Mot de passe réinitialisé. Nouveau mot de passe : " + motDePasseTemporaire);
+                JOptionPane.showMessageDialog(AdminInterface.this, "Mot de passe réinitialisé. Nouveau mot de passe : " + motDePasseTemporaire, "Succès", JOptionPane.INFORMATION_MESSAGE);
             }
         });
 
@@ -181,6 +182,7 @@ public class AdminInterface extends JFrame {
             listeUtilisateurs.append("Username: ").append(utilisateur[0])
                     .append(", Fullname: ").append(utilisateur[1])
                     .append(", Email: ").append(utilisateur[2])
+                    .append(", Role: ").append(utilisateur[3])
                     .append("\n");
         }
 
